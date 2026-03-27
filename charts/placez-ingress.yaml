@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: placez
+spec:
+  selector:
+    matchLabels:
+      app: placez
+  replicas: #{PlacezReplicas}#
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: placez
+    spec:
+      containers:
+        - name: placez
+          image: onskylink.azurecr.io/placez:#{PlacezBuildTag}#
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: 50Mi
+              cpu: 100m
+            limits:
+              memory: 100Mi
+              cpu: '1'
+          ports:
+            - name: 'pl-http'
+              containerPort: 80
+          volumeMounts:
+            - name: config
+              mountPath: /usr/share/nginx/html/config.js
+              subPath: config.js
+      volumes:
+        - name: config
+          configMap:
+            name: placez-public-config
+      nodeSelector:
+        agentpool: placez
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: placez
+spec:
+  ports:
+    - name: 'http'
+      port: 80
+      targetPort: 'pl-http'
+      protocol: 'TCP'
+  selector:
+    app: placez
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: placez-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+    - hosts:
+        -  #{PlacezDomain}#
+      secretName: #{PlacezDomainTlsSecretName}#
+  rules:
+    - host: #{PlacezDomain}#
+      http:
+        paths:
+          - backend:
+              service:
+                name: placez
+                port:
+                  number: 80
+            path: /(.*)
+            pathType: Prefix

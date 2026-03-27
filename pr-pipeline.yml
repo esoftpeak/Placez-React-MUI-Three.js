@@ -1,0 +1,23 @@
+trigger: none
+
+variables:
+  - group: OpenAI-Variables
+
+
+jobs:
+  - job: CodeReview
+    displayName: 'PR Code Review'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - checkout: self
+        persistCredentials: true
+        
+      - task: PRIA@2
+        displayName: 'Run PRIA Code Review'
+        inputs:
+          api_key: '$(OpenAI_ApiKey)'
+          api_version: '2024-12-01-preview'
+          api_endpoint: 'https://horizoncloud-ai.openai.azure.com/'
+          ai_model: 'gpt-4o-mini'
+          file_excludes: '*.yml,*.yaml,Dockerfile,*.dockerfile'

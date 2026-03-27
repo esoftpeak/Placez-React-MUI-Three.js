@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "ms-vsliveshare.vsliveshare",
+    "msjsdiag.debugger-for-chrome",
+    "editorconfig.editorconfig",
+    "ms-vscode.vscode-typescript-tslint-plugin",
+    "gruntfuggly.todo-tree",
+    "mikestead.dotenv"
+  ]
+}

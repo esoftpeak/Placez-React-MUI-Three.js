@@ -1,0 +1,209 @@
+trigger:
+  branches:
+    include:
+      - develop
+
+variables:
+  vmImageName: 'ubuntu-latest'
+  containerRegistrySp: 'placez-ui-sp'
+  containerRegistry: 'placezui'
+  tag: '$(Build.BuildId)'
+  azureSubscription-dev: 'Horizon-Cloud-Dev(25e5cf24-4ad5-403a-97bf-9117b01904a5)'
+  azureSubscription-prod: Horizon-Cloud-Prod(01270381-c17b-4cdd-ba6f-50060e9448d4)'
+  ##dev
+  appName-dev: 'placez-ui-dev-app'
+  imageRepository-dev: 'placezui-dev'
+  ##staging
+  appName-staging: 'placez-ui-staging-app'
+  imageRepository-staging: 'placezui-staging'
+  ##prod
+  appName-prod: 'placez-ui-prod-app'
+  imageRepository-prod: 'placezui-prod'
+
+stages:
+  - stage: Build_dev
+    dependsOn:
+    displayName: Build and push dev
+    jobs:
+      - job: Build
+        displayName: Build
+        pool:
+          vmImage: $(vmImageName)
+        variables:
+          - group: placezui-DEV
+        steps:
+          - task: Docker@2
+            displayName: 'Docker Build'
+            inputs:
+              containerRegistry: '$(containerRegistrySp)'
+              repository: '$(imageRepository-dev)'
+              command: 'build'
+              Dockerfile: '**/Dockerfile'
+              tags: '$(tag)'
+              arguments: >
+                --build-arg SKIP_PREFLIGHT_CHECK=$(SKIP_PREFLIGHT_CHECK)
+                --build-arg REACT_APP_CLIENT_ID=$(REACT_APP_CLIENT_ID)
+                --build-arg REACT_APP_SCOPE=$(REACT_APP_SCOPE)
+                --build-arg REACT_APP_PLACEZ_API_URL=$(REACT_APP_PLACEZ_API_URL)
+                --build-arg REACT_APP_PAYMENTS_API_URL=$(REACT_APP_PAYMENTS_API_URL)
+                --build-arg REACT_APP_PORTAL=$(REACT_APP_PORTAL)
+                --build-arg REACT_APP_LOGIN_REDIRECT=$(REACT_APP_LOGIN_REDIRECT)
+                --build-arg REACT_APP_LOGOUT_REDIRECT=$(REACT_APP_LOGOUT_REDIRECT)
+                --build-arg REACT_APP_ENVIRONMENT=$(REACT_APP_ENVIRONMENT)
+                --build-arg REACT_APP_INSIGHTS_ENABLED=$(REACT_APP_INSIGHTS_ENABLED)
+                --build-arg REACT_APP_INSIGHTS_KEY=$(REACT_APP_INSIGHTS_KEY)
+                --build-arg REACT_APP_GTAG_MEASUREMENT_ID=$(REACT_APP_GTAG_MEASUREMENT_ID)
+                --build-arg REACT_APP_GOOGLE_API_KEY=$(REACT_APP_GOOGLE_API_KEY)
+                --build-arg KENDO_UI_LICENSE=$(KENDO_UI_LICENSE)
+          - task: Docker@2
+            displayName: 'Docker Push to ACR'
+            inputs:
+              containerRegistry: '$(containerRegistrySp)'
+              repository: '$(imageRepository-dev)'
+              command: 'push'
+              tags: '$(tag)'
+  - stage: Build_staging
+    dependsOn:
+    displayName: Build and push staging
+    jobs:
+      - job: Build
+        displayName: Build
+        pool:
+          vmImage: $(vmImageName)
+        variables:
+          - group: placezui-STAGING
+        steps:
+          - task: Docker@2
+            displayName: 'Docker Build'
+            inputs:
+              containerRegistry: '$(containerRegistrySp)'
+              repository: '$(imageRepository-staging)'
+              command: 'build'
+              Dockerfile: '**/Dockerfile'
+              tags: '$(tag)'
+              arguments: >
+                --build-arg SKIP_PREFLIGHT_CHECK=$(SKIP_PREFLIGHT_CHECK)
+                --build-arg REACT_APP_CLIENT_ID=$(REACT_APP_CLIENT_ID)
+                --build-arg REACT_APP_SCOPE=$(REACT_APP_SCOPE)
+                --build-arg REACT_APP_PLACEZ_API_URL=$(REACT_APP_PLACEZ_API_URL)
+                --build-arg REACT_APP_PAYMENTS_API_URL=$(REACT_APP_PAYMENTS_API_URL)
+                --build-arg REACT_APP_PORTAL=$(REACT_APP_PORTAL)
+                --build-arg REACT_APP_LOGIN_REDIRECT=$(REACT_APP_LOGIN_REDIRECT)
+                --build-arg REACT_APP_LOGOUT_REDIRECT=$(REACT_APP_LOGOUT_REDIRECT)
+                --build-arg REACT_APP_ENVIRONMENT=$(REACT_APP_ENVIRONMENT)
+                --build-arg REACT_APP_INSIGHTS_ENABLED=$(REACT_APP_INSIGHTS_ENABLED)
+                --build-arg REACT_APP_INSIGHTS_KEY=$(REACT_APP_INSIGHTS_KEY)
+                --build-arg REACT_APP_GTAG_MEASUREMENT_ID=$(REACT_APP_GTAG_MEASUREMENT_ID)
+                --build-arg REACT_APP_GOOGLE_API_KEY=$(REACT_APP_GOOGLE_API_KEY)
+                --build-arg KENDO_UI_LICENSE=$(KENDO_UI_LICENSE)
+          - task: Docker@2
+            displayName: 'Docker Push to ACR'
+            inputs:
+              containerRegistry: '$(containerRegistrySp)'
+              repository: '$(imageRepository-staging)'
+              command: 'push'
+              tags: '$(tag)'
+  - stage: Build_prod
+    dependsOn:
+    displayName: Build and push prod
+    jobs:
+      - job: Build
+        displayName: Build
+        pool:
+          vmImage: $(vmImageName)
+        variables:
+          - group: placezui-PROD
+        steps:
+          - task: Docker@2
+            displayName: 'Docker Build'
+            inputs:
+              containerRegistry: '$(containerRegistrySp)'
+              repository: '$(imageRepository-prod)'
+              command: 'build'
+              Dockerfile: '**/Dockerfile'
+              tags: '$(tag)'
+              arguments: >
+                --build-arg SKIP_PREFLIGHT_CHECK=$(SKIP_PREFLIGHT_CHECK)
+                --build-arg REACT_APP_CLIENT_ID=$(REACT_APP_CLIENT_ID)
+                --build-arg REACT_APP_SCOPE=$(REACT_APP_SCOPE)
+                --build-arg REACT_APP_PLACEZ_API_URL=$(REACT_APP_PLACEZ_API_URL)
+                --build-arg REACT_APP_PAYMENTS_API_URL=$(REACT_APP_PAYMENTS_API_URL)
+                --build-arg REACT_APP_PORTAL=$(REACT_APP_PORTAL)
+                --build-arg REACT_APP_LOGIN_REDIRECT=$(REACT_APP_LOGIN_REDIRECT)
+                --build-arg REACT_APP_LOGOUT_REDIRECT=$(REACT_APP_LOGOUT_REDIRECT)
+                --build-arg REACT_APP_ENVIRONMENT=$(REACT_APP_ENVIRONMENT)
+                --build-arg REACT_APP_INSIGHTS_ENABLED=$(REACT_APP_INSIGHTS_ENABLED)
+                --build-arg REACT_APP_INSIGHTS_KEY=$(REACT_APP_INSIGHTS_KEY)
+                --build-arg REACT_APP_GTAG_MEASUREMENT_ID=$(REACT_APP_GTAG_MEASUREMENT_ID)
+                --build-arg REACT_APP_GOOGLE_API_KEY=$(REACT_APP_GOOGLE_API_KEY)
+                --build-arg KENDO_UI_LICENSE=$(KENDO_UI_LICENSE)
+          - task: Docker@2
+            displayName: 'Docker Push to ACR'
+            inputs:
+              containerRegistry: '$(containerRegistrySp)'
+              repository: '$(imageRepository-prod)'
+              command: 'push'
+              tags: '$(tag)'
+
+  - stage: Deploy_dev
+    dependsOn: Build_dev
+    displayName: Deploy to DEV container app
+    jobs:
+      - deployment: 'DeployToApp'
+        environment: 'placez-ui-dev'
+        pool:
+          vmImage: $(vmImageName)
+        variables:
+          - group: placezui-DEV
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureWebAppContainer@1
+                  displayName: 'Placez UI Deploy'
+                  inputs:
+                    azureSubscription: $(azureSubscription-dev)
+                    appName: $(appName-dev)
+                    containers: '$(containerRegistry).azurecr.io/$(imageRepository-dev):$(tag)'
+
+  - stage: Deploy_staging
+    dependsOn: Build_staging
+    displayName: Deploy to staging container app
+    jobs:
+      - deployment: 'DeployToApp'
+        environment: 'placez-ui-staging'
+        pool:
+          vmImage: $(vmImageName)
+        variables:
+          - group: placezui-STAGING
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureWebAppContainer@1
+                  displayName: 'Placez UI Deploy'
+                  inputs:
+                    azureSubscription: $(azureSubscription-dev)
+                    appName: $(appName-staging)
+                    containers: '$(containerRegistry).azurecr.io/$(imageRepository-staging):$(tag)'
+
+  - stage: Deploy_prod
+    dependsOn: Build_prod
+    displayName: Deploy to prod container app
+    jobs:
+      - deployment: 'DeployToApp'
+        environment: 'placez-ui-prod'
+        pool:
+          vmImage: $(vmImageName)
+        variables:
+          - group: placezui-PROD
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureWebAppContainer@1
+                  displayName: 'Placez UI Deploy'
+                  inputs:
+                    azureSubscription: 'Horizon-Cloud-Prod(01270381-c17b-4cdd-ba6f-50060e9448d4)'
+                    appName: '$(appName-prod)'
+                    containers: '$(containerRegistry).azurecr.io/$(imageRepository-prod):$(tag)'

@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: placez
+spec:
+  selector:
+    matchLabels:
+      app: placez
+  replicas: #{PlacezReplicas}#
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: placez
+    spec:
+      containers:
+        - name: placez
+          image: onskylink.azurecr.io/placez:#{PlacezBuildTag}#
+          imagePullPolicy: Always
+          ports:
+            - name: 'pl-http'
+              containerPort: 80
+          volumeMounts:
+            - name: config
+              mountPath: /usr/share/nginx/html/config.js
+              subPath: config.js
+      volumes:
+        - name: config
+          configMap:
+            name: placez-public-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: placez
+spec:
+  selector:
+    app: placez
+  type: ClusterIP
+  sessionAffinity: None
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+  ports:
+    - name: placez
+      protocol: TCP
+      port: 80
+      targetPort:
+      # If you set the `spec.type` field to `NodePort` and you want a specific port number,
+      # you can specify a value in the `spec.ports[*].nodePort` field.
+      nodePort:
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: placez
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  tls:
+    - hosts:
+        - placez.horizoncloud.com
+      secretName: horizoncloud.com
+  rules:
+    - host: placez.horizoncloud.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: placez
+                port:
+                  number: 80

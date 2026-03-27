@@ -1,0 +1,32 @@
+resources:
+  repositories:
+    - repository: self
+      clean: true
+
+variables:
+  BuildPlatform: "Any CPU"
+  BuildConfiguration: "Release"
+
+jobs:
+  - job: "Build"
+    pool:
+      vmImage: "ubuntu-latest"
+    variables:
+        - group: placez-ui-dev-k8s
+    steps:
+      - task: NodeTool@0
+        displayName: "Install Node.js"
+        inputs:
+          versionSpec: "18.x"
+      - script: |
+          yarn install
+        displayName: "Install Yarn"
+      - script: |
+          yarn lint
+        displayName: "Lint"
+      - task: Docker@2
+        displayName: "Build"
+        inputs:
+          command: "build"
+          Dockerfile: "**/Dockerfile"
+          arguments: '--build-arg SKIP_PREFLIGHT_CHECK=$(SKIP_PREFLIGHT_CHECK) --build-arg REACT_APP_CLIENT_ID=$(REACT_APP_CLIENT_ID)  --build-arg REACT_APP_SCOPE=$(REACT_APP_SCOPE) --build-arg REACT_APP_PLACEZ_API_URL=$(REACT_APP_PLACEZ_API_URL) --build-arg REACT_APP_PORTAL=$(REACT_APP_PORTAL) --build-arg REACT_APP_LOGIN_REDIRECT=$(REACT_APP_LOGIN_REDIRECT) --build-arg REACT_APP_LOGOUT_REDIRECT=$(REACT_APP_LOGOUT_REDIRECT) --build-arg REACT_APP_ENVIRONMENT=$(REACT_APP_ENVIRONMENT) --build-arg REACT_APP_INSIGHTS_ENABLED=$(REACT_APP_INSIGHTS_ENABLED) --build-arg REACT_APP_INSIGHTS_KEY=$(REACT_APP_INSIGHTS_KEY) --build-arg REACT_APP_GTAG_MEASUREMENT_ID=$(REACT_APP_GTAG_MEASUREMENT_ID) --build-arg REACT_APP_GOOGLE_API_KEY=$(REACT_APP_GOOGLE_API_KEY) --build-arg KENDO_UI_LICENSE=$(KENDO_UI_LICENSE) --build-arg REACT_APP_PAYMENTS_API_URL=$(REACT_APP_PAYMENTS_API_URL)'

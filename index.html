@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <base href="/" />
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=%VITE_APP_GTAG_MEASUREMENT_ID%"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+    </script>
+
+    <meta charset="utf-8" />
+    <link
+      rel="shortcut icon"
+      href="/favicon.ico"
+      id="my-icon-placeholder"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <!-- <meta name="theme-color" content="#000000" /> -->
+    <!--
+      manifest.json provides metadata used when your web app is added to the
+      homescreen on Android. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+
+    <!-- <link rel="manifest" href="/manifest.json" id="my-manifest-placeholder"/> -->
+    <link rel="manifest" id="my-manifest-placeholder" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins&display=swap"
+      rel="stylesheet"
+    />
+    <!--
+      Notice the use of  in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+    <title id="my-title-placeholder">Placez</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+    <!-- Start of Async Drift Code -->
+    <script>
+      'use strict';
+
+      // !function() {
+      //   var t = window.driftt = window.drift = window.driftt || [];
+      //   if (!t.init) {
+      //     if (t.invoked) return void (window.console && console.error && console.error("Drift snippet included twice."));
+      //     t.invoked = !0, t.methods = [ "identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on" ],
+      //     t.factory = function(e) {
+      //       return function() {
+      //         var n = Array.prototype.slice.call(arguments);
+      //         return n.unshift(e), t.push(n), t;
+      //       };
+      //     }, t.methods.forEach(function(e) {
+      //       t[e] = t.factory(e);
+      //     }), t.load = function(t) {
+      //       var e = 3e5, n = Math.ceil(new Date() / e) * e, o = document.createElement("script");
+      //       o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + n + "/" + t + ".js";
+      //       var i = document.getElementsByTagName("script")[0];
+      //       i.parentNode.insertBefore(o, i);
+      //     };
+      //   }
+      // }();
+      // drift.SNIPPET_VERSION = '0.3.1';
+      // if("%ENV_APP_DRIFT_ENABLED%" === "true") {
+      //   drift.load('iyr98kr6xgd6');
+      // }
+      //
+    </script>
+    <style type="text/css">
+      .embeddedServiceHelpButton {
+        z-index: 2000 !important;
+      }
+      .embeddedServiceHelpButton .helpButton {
+        top: 10px;
+        right: 12px;
+      }
+      .embeddedServiceHelpButton .helpButton .uiButton {
+        font-family: 'Arial', sans-serif;
+        border-radius: 0;
+      }
+      @page {
+        margin: 2cm;
+      }
+    </style>
+
+    <!-- <script type='text/javascript' src='https://service.force.com/embeddedservice/5.0/esw.min.js'></script> -->
+    <script type="text/javascript">
+      var initESW = function (gslbBaseURL) {
+        embedded_svc.settings.displayHelpButton = true; //Or false
+        embedded_svc.settings.language = ''; //For example, enter 'en' or 'en-US'
+
+        //embedded_svc.settings.defaultMinimizedText = '...'; //(Defaults to Chat with an Expert)
+        //embedded_svc.settings.disabledMinimizedText = '...'; //(Defaults to Agent Offline)
+
+        //embedded_svc.settings.loadingText = ''; //(Defaults to Loading)
+        //embedded_svc.settings.storageDomain = 'yourdomain.com'; //(Sets the domain for your deployment so that visitors can navigate subdomains during a chat session)
+
+        // Settings for Chat
+        //embedded_svc.settings.directToButtonRouting = function(prechatFormData) {
+        // Dynamically changes the button ID based on what the visitor enters in the pre-chat form.
+        // Returns a valid button ID.
+        //};
+        //embedded_svc.settings.prepopulatedPrechatFields = {}; //Sets the auto-population of pre-chat form fields
+        //embedded_svc.settings.fallbackRouting = []; //An array of button IDs, user IDs, or userId_buttonId
+        //embedded_svc.settings.offlineSupportMinimizedText = '...'; //(Defaults to Contact Us)
+
+        embedded_svc.settings.enabledFeatures = ['LiveAgent'];
+        embedded_svc.settings.entryFeature = 'LiveAgent';
+
+        embedded_svc.init(
+          'https://caterease1234.my.salesforce.com',
+          'https://horizonbusinessservices.secure.force.com/liveAgentSetupFlow',
+          gslbBaseURL,
+          '00D2E000000oPrJ',
+          'TechSupport_Chat',
+          {
+            baseLiveAgentContentURL:
+              'https://c.la1-c2-ia2.salesforceliveagent.com/content',
+            deploymentId: '5722E000000bzj5',
+            buttonId: '5732E000000gC7h',
+            baseLiveAgentURL:
+              'https://d.la1-c2-ia2.salesforceliveagent.com/chat',
+            eswLiveAgentDevName: 'TechSupport_Chat',
+            isOfflineSupportEnabled: false,
+          }
+        );
+      };
+
+      if (!window.embedded_svc) {
+        var s = document.createElement('script');
+        s.setAttribute(
+          'src',
+          'https://caterease1234.my.salesforce.com/embeddedservice/5.0/esw.min.js'
+        );
+        s.onload = function () {
+          // initESW(null);
+        };
+        var el = document.getElementById('sfChat');
+        // el.appendChild(s);
+      } else {
+        setTimeout(() => {
+          const sfChatWrapper = document.getElementById('sfChat');
+          if (sfChatWrapper) {
+            sfChatWrapper.style.display = 'block';
+            initESW('https://service.force.com');
+          }
+        }, 20000);
+      }
+    </script>
+
+    <!-- End of Async Drift Code -->
+    <a
+      id="liveagent_button_online_5732E000000gC7h"
+      href="javascript://Chat"
+      style="display: none"
+      onclick="liveagent.startChat('5732E000000gC7h')"
+      ><!-- Online Chat Content --></a
+    >
+    <div id="liveagent_button_offline_5732E000000gC7h" style="display: none">
+      <!-- Offline Chat Content -->
+    </div>
+    <script type="text/javascript">
+      if (!window._laq) {
+        window._laq = [];
+      }
+      window._laq.push(function () {
+        liveagent.showWhenOnline(
+          '5732E000000gC7h',
+          document.getElementById('liveagent_button_online_5732E000000gC7h')
+        );
+        liveagent.showWhenOffline(
+          '5732E000000gC7h',
+          document.getElementById('liveagent_button_offline_5732E000000gC7h')
+        );
+      });
+    </script>
+    <script type="module" src="/src/index.tsx"></script>
+  </body>
+</html>

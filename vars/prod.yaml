@@ -1,0 +1,49 @@
+fullnameOverride: "placez-app"
+
+image:
+    # -- Image to use for deploying, must support an entrypoint which creates users/databases from appropriate config files
+    # -- The container image repository that should be used.  E.g 'nginx', 'gcr.io/kubernetes-helm/tiller'.
+  repository: nginx
+  pullPolicy: IfNotPresent
+  tag: "latest"
+replicaCount: 1
+
+nodeSelector:
+  agentpool: application
+
+## Istio virtual service and gateway configurations.
+istio:
+  enabled: true
+  gateway:
+    names:
+    - 'istio-system/istio-ingressgateway-https-horizoncloud'
+  virtualService:
+    hosts:
+    # - #{PlacezApiDomain}#
+    - placez.horizoncloud.com
+
+volume:
+  enabled: false
+  mountPath: "/usr/share/nginx/html/config.js"
+  subPath: config.js
+  configMap:
+    name: placez-ui-config
+
+job:
+ enabled: false
+
+service:
+  targetPort: 80
+
+# #job for dbmigrator
+# job:
+#  enabled: true
+#  image:
+#   repository: nginx
+#   tag: "latest"
+#  volume:
+#   enabled: true
+#   mountPath: "/app/appsettings.json"
+#   subPath: appsettings.json
+#   configMap:
+#     name: placez-api-settings

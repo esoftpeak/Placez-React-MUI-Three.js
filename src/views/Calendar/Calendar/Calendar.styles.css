@@ -1,0 +1,8 @@
+.rbc-event {
+  background-color: transparent;
+}
+
+.rbc-event:focus,
+.rbc-event:active {
+  background-color: transparent;
+}

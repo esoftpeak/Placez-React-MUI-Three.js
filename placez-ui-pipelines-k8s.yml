@@ -1,0 +1,281 @@
+trigger:
+  branches:
+    include:
+      - develop
+
+variables:
+  vmImageName: "ubuntu-latest"
+  containerRegistrySp: 'hcdevusacr-sp'
+  containerRegistryDev: 'hcdevusacr'
+  tag: "$(Build.BuildId)"
+  DOCKER_BUILDKIT: '1'
+  ##SonarQube
+  SonarQubeSp: 'placez-ui-sonar-sp'  
+  ##dev
+  imageRepository-dev: 'placez-ui-dev'
+  ##staging
+  imageRepository-staging: 'placez-ui-staging'
+  ##beta
+  imageRepository-beta: 'placez-ui-beta'
+  ##prod
+  containerRegistrySp-prod: 'hcprodusacr-sp'
+  imageRepository-prod: 'placez-ui-prod'
+
+stages:
+  - stage: HelmChartValidationAndPublish
+    displayName: "Helm Chart Validation & Publish"
+    jobs:
+      - job: HelmChecksAndPublish
+        displayName: "Validate & Publish Helm Charts"
+        pool:
+          vmImage: $(vmImageName)
+        variables:
+          CHART_DIR: helmchart
+          KUBE_VERSION: "1.33.0"
+          OCI_REGISTRY: 'hcdevusacr.azurecr.io'
+          OCI_CHART_PATH: 'oci://hcdevusacr.azurecr.io/helm/helmchart'
+        steps:
+          - checkout: self
+          
+          - task: HelmInstaller@1
+            displayName: "Install Helm 3.18"
+            inputs:
+              helmVersionToInstall: '3.18.0'
+          
+          - task: AzureCLI@2
+            displayName: "Login to ACR & Get Latest Version"
+            inputs:
+              azureSubscription: 'hc-dev'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                set -euo pipefail
+                az acr login --name hcdevusacr
+                LATEST_VERSION=$(az acr repository show-tags --name hcdevusacr --repository helm/helmchart --orderby time_desc --top 1 --output tsv)
+                echo "Latest chart version: $LATEST_VERSION"
+                echo "##vso[task.setvariable variable=CHART_VERSION]$LATEST_VERSION"
+                TOKEN=$(az acr login --name hcdevusacr --expose-token --output tsv --query accessToken)
+                helm registry login $(OCI_REGISTRY) --username 00000000-0000-0000-0000-000000000000 --password $TOKEN
+          
+          - bash: |
+              set -euo pipefail
+              echo "==> Pulling Helm chart version $(CHART_VERSION)"
+              helm pull $(OCI_CHART_PATH) --version $(CHART_VERSION) --untar --untardir .
+              ls -la $(CHART_DIR)
+            displayName: "Pull Helm Chart from OCI"
+          
+          - bash: |
+              set -euo pipefail
+              helm dependency build "$(CHART_DIR)"
+            displayName: "Helm dependency build"
+          
+          - bash: |
+              set -euo pipefail
+              echo "==> Validating Helm chart"
+              helm lint "$(CHART_DIR)" --strict
+              for values_file in vars/*.yaml; do
+                if [ -f "$values_file" ]; then
+                  echo ">>> Linting with: $values_file"
+                  helm lint "$(CHART_DIR)" --strict -f "$values_file"
+                  helm template release-test "$(CHART_DIR)" -f "$values_file" --kube-version "$(KUBE_VERSION)" --debug >/dev/null
+                fi
+              done
+            displayName: "Helm lint & template"
+          
+          - bash: |
+              set -euo pipefail
+              cp -r vars "$(CHART_DIR)/"
+              ls -la "$(CHART_DIR)/"
+            displayName: "Merge vars with chart"
+          
+          - task: CopyFiles@2
+            displayName: "Copy Helm chart to staging"
+            inputs:
+              SourceFolder: 'helmchart'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)/helmchart'
+          
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish Helm Chart Artifact"
+            inputs:
+              targetPath: '$(Build.ArtifactStagingDirectory)'
+              artifact: 'drop'
+              publishLocation: 'pipeline'
+
+  - stage: SonarQubeAnalysis
+    dependsOn:
+    displayName: "SonarQube Analysis"
+    variables:
+      - group: placez-ui-sonar-k8s              
+    jobs:
+      - job: SonarQubeJob
+        displayName: 'Run SonarQube Analysis'
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+          - task: PowerShell@2
+            displayName: 'Set sonar_exclusions dynamically'
+            inputs:
+              targetType: 'inline'
+              script: |
+                if ("$(helm_scan)" -eq "true") {
+                  Write-Host "##vso[task.setvariable variable=sonar_exclusions]**/node_modules/**,**/dist/**,**/*.spec.js,**/*.test.js"
+                } else {
+                  Write-Host "##vso[task.setvariable variable=sonar_exclusions]**/node_modules/**,**/dist/**,**/*.spec.js,**/*.test.js,helmchart/**"
+                }
+          - task: SonarQubePrepare@7
+            displayName: 'Prepare SonarQube Analysis'
+            inputs:
+              SonarQube: '$(SonarQubeSp)'       
+              scannerMode: 'CLI'                  
+              configMode: 'manual'
+              cliProjectKey: '$(ProjectKey)'
+              cliProjectName: '$(ProjectName)'
+              extraProperties: |
+                sonar.sources=.
+                sonar.exclusions=$(sonar_exclusions)
+          - task: PowerShell@2
+            displayName: 'Remove Branch Parameter'
+            inputs:
+              targetType: 'inline'
+              script: |
+                $params = "$env:SONARQUBE_SCANNER_PARAMS" -replace '"sonar.branch.name":"[^"]*",?'
+                Write-Host "##vso[task.setvariable variable=SONARQUBE_SCANNER_PARAMS]$params"
+          - task: SonarQubeAnalyze@7
+            displayName: 'Run Code Analysis'
+          - task: solucionespsg.SonarQubeMetricsReport.psg.SonarQubeMetricsReport.SonarQubeMetricsReport@0
+            displayName: 'SonarQube Metrics Report'
+            inputs:
+              proyUrl: '$(SonarUrl)'
+              proyKey: '$(ProjectKey)'
+              proyNombre: '$(ProjectName)'
+              proyBranch: 'develop'
+              proyToken: '$(SonarToken)'
+              archivoHtml: '$(System.DefaultWorkingDirectory)/sonarqube_metrics.html'
+          - task: PublishHtmlReport@1
+            displayName: 'Publish SonarQube Report'
+            inputs:
+                reportDir: '$(System.DefaultWorkingDirectory)/sonarqube_metrics.html'
+                useFilenameTabs: false
+                tabName: 'SonarQube Metrics'
+
+  - stage: Build_dev
+    dependsOn:
+    displayName: Build and push dev
+    jobs:
+      - job: Build
+        displayName: Build_dev
+        pool:
+          vmImage: $(vmImageName)
+        variables:
+        - group: placez-ui-dev-k8s
+        steps:
+          - task: Docker@2
+            displayName: "Docker Build"
+            inputs:
+              containerRegistry: '$(containerRegistrySp)'
+              repository: '$(imageRepository-dev)'
+              command: 'build'
+              Dockerfile: '**/Dockerfile'
+              tags: '$(tag)'
+              arguments: '--build-arg SKIP_PREFLIGHT_CHECK=$(SKIP_PREFLIGHT_CHECK) --build-arg REACT_APP_CLIENT_ID=$(REACT_APP_CLIENT_ID)  --build-arg REACT_APP_SCOPE=$(REACT_APP_SCOPE) --build-arg REACT_APP_PLACEZ_API_URL=$(REACT_APP_PLACEZ_API_URL) --build-arg REACT_APP_PORTAL=$(REACT_APP_PORTAL) --build-arg REACT_APP_LOGIN_REDIRECT=$(REACT_APP_LOGIN_REDIRECT) --build-arg REACT_APP_LOGOUT_REDIRECT=$(REACT_APP_LOGOUT_REDIRECT) --build-arg REACT_APP_ENVIRONMENT=$(REACT_APP_ENVIRONMENT) --build-arg REACT_APP_INSIGHTS_ENABLED=$(REACT_APP_INSIGHTS_ENABLED) --build-arg REACT_APP_INSIGHTS_KEY=$(REACT_APP_INSIGHTS_KEY) --build-arg REACT_APP_GTAG_MEASUREMENT_ID=$(REACT_APP_GTAG_MEASUREMENT_ID) --build-arg REACT_APP_GOOGLE_API_KEY=$(REACT_APP_GOOGLE_API_KEY) --build-arg KENDO_UI_LICENSE=$(KENDO_UI_LICENSE) --build-arg REACT_APP_PAYMENTS_API_URL=$(REACT_APP_PAYMENTS_API_URL)'
+          - task: trivy@1
+            displayName: 'Scan Docker Image with Trivy'
+            inputs:
+              version: 'latest'
+              exitCode: '0'
+              debug: true
+              type: 'image'
+              image: '$(containerRegistryDev).azurecr.io/$(imageRepository-dev):$(tag)'
+              jsonOutput: true
+              sarifOutput: true
+          - task: Docker@2
+            displayName: "Docker Push to ACR"
+            inputs:
+              containerRegistry: '$(containerRegistrySp)'
+              repository: '$(imageRepository-dev)'
+              command: 'push'
+              tags: '$(tag)'
+
+  - stage: Build_staging
+    dependsOn:
+    displayName: Build and push stage
+    jobs:
+      - job: Build
+        displayName: Build_staging
+        pool:
+          vmImage: $(vmImageName)
+        variables:
+        - group: placez-ui-staging-k8s
+        steps:
+          - task: Docker@2
+            displayName: "Docker Build"
+            inputs:
+              containerRegistry: '$(containerRegistrySp)'
+              repository: '$(imageRepository-staging)'
+              command: 'build'
+              Dockerfile: '**/Dockerfile'
+              tags: '$(tag)'
+              arguments: '--build-arg SKIP_PREFLIGHT_CHECK=$(SKIP_PREFLIGHT_CHECK) --build-arg REACT_APP_CLIENT_ID=$(REACT_APP_CLIENT_ID)  --build-arg REACT_APP_SCOPE=$(REACT_APP_SCOPE) --build-arg REACT_APP_PLACEZ_API_URL=$(REACT_APP_PLACEZ_API_URL) --build-arg REACT_APP_PORTAL=$(REACT_APP_PORTAL) --build-arg REACT_APP_LOGIN_REDIRECT=$(REACT_APP_LOGIN_REDIRECT) --build-arg REACT_APP_LOGOUT_REDIRECT=$(REACT_APP_LOGOUT_REDIRECT) --build-arg REACT_APP_ENVIRONMENT=$(REACT_APP_ENVIRONMENT) --build-arg REACT_APP_INSIGHTS_ENABLED=$(REACT_APP_INSIGHTS_ENABLED) --build-arg REACT_APP_INSIGHTS_KEY=$(REACT_APP_INSIGHTS_KEY) --build-arg REACT_APP_GTAG_MEASUREMENT_ID=$(REACT_APP_GTAG_MEASUREMENT_ID) --build-arg REACT_APP_GOOGLE_API_KEY=$(REACT_APP_GOOGLE_API_KEY) --build-arg KENDO_UI_LICENSE=$(KENDO_UI_LICENSE) --build-arg REACT_APP_PAYMENTS_API_URL=$(REACT_APP_PAYMENTS_API_URL)'
+          - task: Docker@2
+            displayName: "Docker Push to ACR"
+            inputs:
+              containerRegistry: '$(containerRegistrySp)'
+              repository: '$(imageRepository-staging)'
+              command: 'push'
+              tags: '$(tag)'
+
+  - stage: Build_beta
+    dependsOn:
+    displayName: Build and push beta
+    jobs:
+      - job: Build
+        displayName: Build_beta
+        pool:
+          vmImage: $(vmImageName)
+        variables:
+        - group: placez-ui-beta-k8s
+        steps:
+          - task: Docker@2
+            displayName: "Docker Build"
+            inputs:
+              containerRegistry: '$(containerRegistrySp-prod)'
+              repository: '$(imageRepository-beta)'
+              command: 'build'
+              Dockerfile: '**/Dockerfile'
+              tags: '$(tag)'
+              arguments: '--build-arg SKIP_PREFLIGHT_CHECK=$(SKIP_PREFLIGHT_CHECK) --build-arg REACT_APP_CLIENT_ID=$(REACT_APP_CLIENT_ID)  --build-arg REACT_APP_SCOPE=$(REACT_APP_SCOPE) --build-arg REACT_APP_PLACEZ_API_URL=$(REACT_APP_PLACEZ_API_URL) --build-arg REACT_APP_PORTAL=$(REACT_APP_PORTAL) --build-arg REACT_APP_LOGIN_REDIRECT=$(REACT_APP_LOGIN_REDIRECT) --build-arg REACT_APP_LOGOUT_REDIRECT=$(REACT_APP_LOGOUT_REDIRECT) --build-arg REACT_APP_ENVIRONMENT=$(REACT_APP_ENVIRONMENT) --build-arg REACT_APP_INSIGHTS_ENABLED=$(REACT_APP_INSIGHTS_ENABLED) --build-arg REACT_APP_INSIGHTS_KEY=$(REACT_APP_INSIGHTS_KEY) --build-arg REACT_APP_GTAG_MEASUREMENT_ID=$(REACT_APP_GTAG_MEASUREMENT_ID) --build-arg REACT_APP_GOOGLE_API_KEY=$(REACT_APP_GOOGLE_API_KEY) --build-arg KENDO_UI_LICENSE=$(KENDO_UI_LICENSE) --build-arg REACT_APP_PAYMENTS_API_URL=$(REACT_APP_PAYMENTS_API_URL)'
+          - task: Docker@2
+            displayName: "Docker Push to ACR"
+            inputs:
+              containerRegistry: '$(containerRegistrySp-prod)'
+              repository: '$(imageRepository-beta)'
+              command: 'push'
+              tags: '$(tag)'
+
+  - stage: Build_prod
+    dependsOn:
+    displayName: Build and push prod
+    jobs:
+      - job: Build
+        displayName: Build_prod
+        pool:
+          vmImage: $(vmImageName)
+        variables:
+        - group: placez-ui-prod-k8s
+        steps:
+          - task: Docker@2
+            displayName: "Docker Build"
+            inputs:
+              containerRegistry: '$(containerRegistrySp-prod)'
+              repository: '$(imageRepository-prod)'
+              command: 'build'
+              Dockerfile: '**/Dockerfile'
+              tags: '$(tag)'
+              arguments: '--build-arg SKIP_PREFLIGHT_CHECK=$(SKIP_PREFLIGHT_CHECK) --build-arg REACT_APP_CLIENT_ID=$(REACT_APP_CLIENT_ID)  --build-arg REACT_APP_SCOPE=$(REACT_APP_SCOPE) --build-arg REACT_APP_PLACEZ_API_URL=$(REACT_APP_PLACEZ_API_URL) --build-arg REACT_APP_PORTAL=$(REACT_APP_PORTAL) --build-arg REACT_APP_LOGIN_REDIRECT=$(REACT_APP_LOGIN_REDIRECT) --build-arg REACT_APP_LOGOUT_REDIRECT=$(REACT_APP_LOGOUT_REDIRECT) --build-arg REACT_APP_ENVIRONMENT=$(REACT_APP_ENVIRONMENT) --build-arg REACT_APP_INSIGHTS_ENABLED=$(REACT_APP_INSIGHTS_ENABLED) --build-arg REACT_APP_INSIGHTS_KEY=$(REACT_APP_INSIGHTS_KEY) --build-arg REACT_APP_GTAG_MEASUREMENT_ID=$(REACT_APP_GTAG_MEASUREMENT_ID) --build-arg REACT_APP_GOOGLE_API_KEY=$(REACT_APP_GOOGLE_API_KEY) --build-arg KENDO_UI_LICENSE=$(KENDO_UI_LICENSE) --build-arg REACT_APP_PAYMENTS_API_URL=$(REACT_APP_PAYMENTS_API_URL)'
+          - task: Docker@2
+            displayName: "Docker Push to ACR"
+            inputs:
+              containerRegistry: '$(containerRegistrySp-prod)'
+              repository: '$(imageRepository-prod)'
+              command: 'push'
+              tags: '$(tag)'

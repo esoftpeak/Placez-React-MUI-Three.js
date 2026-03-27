@@ -1,0 +1,213 @@
+{
+  "metadata": {
+    "version": 4.5,
+    "type": "Material",
+    "generator": "Material.toJSON"
+  },
+  "uuid": "1DFBA969-03B6-4FA0-B2FE-DD909135C3F9",
+  "type": "MeshPhysicalMaterial",
+  "color": 16777215,
+  "roughness": 1,
+  "metalness": 0,
+  "emissive": 0,
+  "map": "05B2D697-E7E2-466E-A8CD-172D11EFB8CB",
+  "normalMap": "15B2D697-E7E2-466E-A8CD-172D11EFB8CB",
+  "roughnessMap": "25B2D697-E7E2-466E-A8CD-172D11EFB8CB",
+  "bumpMap": "35B2D697-E7E2-466E-A8CD-172D11EFB8CB",
+  "aoMap": "45B2D697-E7E2-466E-A8CD-172D11EFB8CB",
+  "side": 1,
+  "depthFunc": 3,
+  "depthTest": false,
+  "depthWrite": true,
+  "stencilWrite": false,
+  "stencilWriteMask": 255,
+  "stencilFunc": 519,
+  "stencilRef": 0,
+  "stencilFuncMask": 255,
+  "stencilFail": 7680,
+  "stencilZFail": 7680,
+  "stencilZPass": 7680,
+  "textures": [
+    {
+      "uuid": "05B2D697-E7E2-466E-A8CD-172D11EFB8CB",
+      "name": "",
+      "mapping": 300,
+      "repeat": [1, 1],
+      "offset": [0, 0],
+      "center": [0, 0],
+      "rotation": 0,
+      "wrap": [1000, 1000],
+      "format": 1022,
+      "type": 1009,
+      "encoding": 3001,
+      "minFilter": 1008,
+      "magFilter": 1006,
+      "anisotropy": 1,
+      "flipY": true,
+      "premultiplyAlpha": false,
+      "unpackAlignment": 4,
+      "image": "0D98CD51-12A1-41F0-8D05-AF465D566CF6"
+    },
+    {
+      "uuid": "15B2D697-E7E2-466E-A8CD-172D11EFB8CB",
+      "name": "",
+      "mapping": 300,
+      "repeat": [1, 1],
+      "offset": [0, 0],
+      "center": [0, 0],
+      "rotation": 0,
+      "wrap": [1000, 1000],
+      "format": 1022,
+      "type": 1009,
+      "encoding": 3001,
+      "minFilter": 1008,
+      "magFilter": 1006,
+      "anisotropy": 1,
+      "flipY": true,
+      "premultiplyAlpha": false,
+      "unpackAlignment": 4,
+      "image": "1D98CD51-12A1-41F0-8D05-AF465D566CF6"
+    },
+    {
+      "uuid": "25B2D697-E7E2-466E-A8CD-172D11EFB8CB",
+      "name": "",
+      "mapping": 300,
+      "repeat": [1, 1],
+      "offset": [0, 0],
+      "center": [0, 0],
+      "rotation": 0,
+      "wrap": [1000, 1000],
+      "format": 1022,
+      "type": 1009,
+      "encoding": 3001,
+      "minFilter": 1008,
+      "magFilter": 1006,
+      "anisotropy": 1,
+      "flipY": true,
+      "premultiplyAlpha": false,
+      "unpackAlignment": 4,
+      "image": "2D98CD51-12A1-41F0-8D05-AF465D566CF6"
+    },
+    {
+      "uuid": "35B2D697-E7E2-466E-A8CD-172D11EFB8CB",
+      "name": "",
+      "mapping": 300,
+      "repeat": [1, 1],
+      "offset": [0, 0],
+      "center": [0, 0],
+      "rotation": 0,
+      "wrap": [1000, 1000],
+      "format": 1022,
+      "type": 1009,
+      "encoding": 3001,
+      "minFilter": 1008,
+      "magFilter": 1006,
+      "anisotropy": 1,
+      "flipY": true,
+      "premultiplyAlpha": false,
+      "unpackAlignment": 4,
+      "image": "3D98CD51-12A1-41F0-8D05-AF465D566CF6"
+    },
+    {
+      "uuid": "45B2D697-E7E2-466E-A8CD-172D11EFB8CB",
+      "name": "",
+      "mapping": 300,
+      "repeat": [1, 1],
+      "offset": [0, 0],
+      "center": [0, 0],
+      "rotation": 0,
+      "wrap": [1000, 1000],
+      "format": 1022,
+      "type": 1009,
+      "encoding": 3001,
+      "minFilter": 1008,
+      "magFilter": 1006,
+      "anisotropy": 1,
+      "flipY": true,
+      "premultiplyAlpha": false,
+      "unpackAlignment": 4,
+      "image": "4D98CD51-12A1-41F0-8D05-AF465D566CF6"
+    }
+  ],
+  "images3": [
+    {
+      "uuid": "0D98CD51-12A1-41F0-8D05-AF465D566CF6",
+      "name": "color",
+      "url": "https://dev-placez-media.horizoncloud.com/Assets/48fc658f-b15d-4361-8cb7-f522969dcf30.jpg"
+    },
+    {
+      "uuid": "1D98CD51-12A1-41F0-8D05-AF465D566CF6",
+      "name": "normal",
+      "url": "https://dev-placez-media.horizoncloud.com/Assets/6634e50e-a63d-4be3-bebd-62954009fff5.jpg"
+    },
+    {
+      "uuid": "2D98CD51-12A1-41F0-8D05-AF465D566CF6",
+      "name": "roughness",
+      "url": "https://dev-placez-media.horizoncloud.com/Assets/69db1fac-a40e-4bdb-9838-cb213f3ef5ee.jpg"
+    },
+    {
+      "uuid": "3D98CD51-12A1-41F0-8D05-AF465D566CF6",
+      "name": "height",
+      "url": ""
+    },
+    {
+      "uuid": "4D98CD51-12A1-41F0-8D05-AF465D566CF6",
+      "name": "ambient",
+      "url": "https://dev-placez-media.horizoncloud.com/Assets/2ff95aeb-9746-407a-8478-4123d65f7e5c.jpg"
+    }
+  ],
+  "images2": [
+    {
+      "uuid": "0D98CD51-12A1-41F0-8D05-AF465D566CF6",
+      "name": "color",
+      "url": "https://dev-placez-media.horizoncloud.com/Assets/d246b1d9-975b-4c7d-ae4a-98a2437922cc.jpg"
+    },
+    {
+      "uuid": "1D98CD51-12A1-41F0-8D05-AF465D566CF6",
+      "name": "normal",
+      "url": "https://dev-placez-media.horizoncloud.com/Assets/7f052b39-270a-452b-ad8f-5ad21af41134.jpg"
+    },
+    {
+      "uuid": "2D98CD51-12A1-41F0-8D05-AF465D566CF6",
+      "name": "roughness",
+      "url": "https://dev-placez-media.horizoncloud.com/Assets/86526a50-3369-45f7-82c3-2126495609c6.jpg"
+    },
+    {
+      "uuid": "3D98CD51-12A1-41F0-8D05-AF465D566CF6",
+      "name": "height",
+      "url": "https://dev-placez-media.horizoncloud.com/Assets/8f062809-6506-46c4-b86f-b3e25c092cb1.png"
+    },
+    {
+      "uuid": "4D98CD51-12A1-41F0-8D05-AF465D566CF6",
+      "name": "ambient",
+      "url": "https://dev-placez-media.horizoncloud.com/Assets/75081bbf-1d40-42ee-a86a-7f4c73c354a0.jpg"
+    }
+  ],
+  "images": [
+    {
+      "uuid": "0D98CD51-12A1-41F0-8D05-AF465D566CF6",
+      "name": "color",
+      "url": "https://dev-placez-media.horizoncloud.com/Assets/3f62ce4c-a28f-470d-a912-1bd0127f924d.jpg"
+    },
+    {
+      "uuid": "1D98CD51-12A1-41F0-8D05-AF465D566CF6",
+      "name": "normal",
+      "url": "https://dev-placez-media.horizoncloud.com/Assets/e86df8a6-f7fe-4726-96e3-21e827e86ac0.jpg"
+    },
+    {
+      "uuid": "2D98CD51-12A1-41F0-8D05-AF465D566CF6",
+      "name": "roughness",
+      "url": "https://dev-placez-media.horizoncloud.com/Assets/347a323e-b1d6-4307-949a-09038d0078cf.jpg"
+    },
+    {
+      "uuid": "3D98CD51-12A1-41F0-8D05-AF465D566CF6",
+      "name": "height",
+      "url": "https://dev-placez-media.horizoncloud.com/Assets/972b142c-c635-4417-8ec5-6e092520039a.png"
+    },
+    {
+      "uuid": "4D98CD51-12A1-41F0-8D05-AF465D566CF6",
+      "name": "ambient",
+      "url": "https://dev-placez-media.horizoncloud.com/Assets/e493adc8-59fd-4848-92d7-444ab16e0c0a.jpg"
+    }
+  ]
+}

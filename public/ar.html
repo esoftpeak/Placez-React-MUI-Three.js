@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <!-- <link rel="shortcut icon" href="favicon.ico" /> -->
+    <!-- <title>Placez</title> -->
+    <script
+      type="module"
+      src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.1.1/model-viewer.min.js"
+    ></script>
+  </head>
+  <body onload="javascript:Load3dModel()">
+    <script type="text/javascript">
+      function Load3dModel() {
+        const url = window.location;
+        const urlObject = new URL(url);
+        const src = urlObject.searchParams.get('src');
+        var modelViewer = document.getElementById('3dModelViewer');
+        modelViewer.setAttribute('src', src);
+      }
+    </script>
+    <style>
+      .fullScreenViewer {
+        position: fixed;
+        padding: 0;
+        margin: 0;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <model-viewer
+      class="fullScreenViewer"
+      id="3dModelViewer"
+      ar
+      ar-placement="floor"
+      camera-controls
+      alt="A 3D model"
+      background-color="#222"
+    >
+    </model-viewer>
+  </body>
+</html>

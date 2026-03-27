@@ -1,0 +1,33 @@
+import { TextField } from '@mui/material';
+import { styled } from '@mui/material/styles';
+
+const PlacezLongTextField = styled(TextField)(({ theme }) => ({
+  width: '100%',
+  flex: '1',
+  margin: `${theme.spacing()}px ${theme.spacing()}px`,
+  '& .MuiInputBase-root': {},
+  '& .MuiInputBase-input': {},
+  '& label.Mui-focused': {
+    color: '#A0AAB4',
+  },
+  '& .MuiInput-underline:after': {
+    borderBottomColor: '#B2BAC2',
+  },
+  '& .MuiOutlinedInput-notchedOutline': {
+    border: `none`,
+    '& fieldset': {
+      borderColor: '#E0E3E7',
+    },
+    '&:hover fieldset': {
+      borderColor: '#B2BAC2',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#6F7E8C',
+    },
+  },
+}));
+PlacezLongTextField.defaultProps = {
+  multiline: true,
+};
+
+export default PlacezLongTextField;
