@@ -2,15 +2,20 @@
 
 Placez is a planning platform for catering and event teams. It combines business workflows (events, clients, payments, scheduling, settings) with a 2D/3D layout designer powered by Three.js.
 
-## Project Demo Video
+## 🎥 Project Demo Video
 
-<video src="./3D%20Placez%20Project.mp4" autoplay muted loop playsinline controls width="100%">
-  Your browser does not support the video tag.
+<video src="https://github.com/user-attachments/assets/6f3c84af-b4c8-4158-8ed7-851fe72bb4bb"
+  controls
+  muted
+  playsinline
+  style="max-height:640px; width:100%; border-radius:10px;">
 </video>
 
-If autoplay is blocked by the platform/browser, use this direct file link: [`3D Placez Project.mp4`](./3D%20Placez%20Project.mp4).
+<p>
+  <a href="./3D%20Placez%20Project.mp4"><strong>📁 Watch Repo Video</strong></a>
+</p>
 
-## What the Application Includes
+## ✨ What the Application Includes
 
 - **Dashboard and metrics** for event and revenue visibility
 - **Event management** with event list, details, and layout planning
@@ -23,7 +28,7 @@ If autoplay is blocked by the platform/browser, use this direct file link: [`3D 
 - **OIDC authentication** through Customer Portal with silent renew
 - **Environment-specific tools** for media/catalog management in non-production
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 - React + TypeScript + Vite
 - Redux + Redux Saga
